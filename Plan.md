@@ -69,8 +69,12 @@ and `main_activity_code` — used to write the cleaning code correctly):
 - Activity code mapping (power vs. industry grouping depends on this):
   `Translation of activity codes May 2019.xlsx`
   https://sdi.eea.europa.eu/catalogue/api/records/9eee3fc9-3060-4e3f-bc8d-e22e7c3f6bda/attachments/Translation%20of%20activity%20codes%20May%202019.xlsx
-  **This file is NOT in the data zip** — it must be fetched separately
-  from this URL (or the codes transcribed from it) before step 6.
+  **This file is NOT in the data zip, and the URL is dead** (EEA returns
+  "Metadata resource ... not found", Oct 2026). The same code list is
+  printed as Table 6-1 of the background note PDF in the zip; the
+  notebook transcribes it from there: `10` aviation, `20` combustion of
+  fuels, `21`–`46` industrial activities, `50` maritime, `99` opt-ins;
+  `20-99` = all stationary, `21-99` = all industrial.
 - EU ETS data viewer user manual (PDF) — may help interpret the
   `citl_information` metric hierarchy:
   https://sdi.eea.europa.eu/catalogue/api/records/9eee3fc9-3060-4e3f-bc8d-e22e7c3f6bda/attachments/EEA_EUETS_data_viewer_user%20manual_June12.pdf
@@ -130,6 +134,22 @@ notebook, section 2):
 - **`version`** — always `82`.
 
 ## Cleaning Steps
+
+**Status: all steps below, the charts, the test and the robustness checks
+are implemented in the notebook (sections 3–7).** Decisions made while
+executing:
+- Step 5: `2.` and `2.1` differ only for aviation, so `2.` is used.
+  2025 uses reported figures (gap-fill would add 0.6%) and is flagged
+  provisional.
+- Steps 8–9: Power = code `20`; Industry = codes `21`–`44`. Dropped:
+  `10`, `50`, `45`/`46` (CCS, ~0 emissions), `99` (opt-ins, unclear
+  activity), and the aggregates.
+- **Scope jump:** Phase 3 added ~60 Mt of new industrial activities in
+  2013. The regression gives each sector its own 2013 level shift, and a
+  constant-scope industry series (codes 21–24, 29–32, 35, 36) is used
+  as a robustness check.
+- Step 10: EU-24 (EU-27 minus BG, RO, HR, which lack full 2005–2025
+  coverage). Malta has no industrial installations.
 
 1. ✅ **Done.** Pull the zip via `requests`, read the Excel workbook
    in memory, and load it into pandas.
